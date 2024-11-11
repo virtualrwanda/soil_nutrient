@@ -1,0 +1,44 @@
+dash_app.layout = html.Div(className="container mx-auto", children=[
+    # Navigation Bar
+    html.Nav(className="bg-blue-600 p-4", children=[
+        html.Div(className="container mx-auto flex justify-between items-center", children=[
+            html.A('Crop Prediction', href='/', className="text-white text-2xl font-bold"),
+            html.Div(children=[
+                html.A('Home', href='/', className="text-white hover:text-gray-300 mx-4"),
+                html.A('Dashboard', href='/dashboard/', className="text-white hover:text-gray-300 mx-4"),
+                html.A('About', href='/about', className="text-white hover:text-gray-300 mx-4"),
+                html.A('Contact', href='/contact', className="text-white hover:text-gray-300 mx-4")
+            ])
+        ])
+    ]),
+
+    # Main Content
+    html.Div(className="py-12", children=[
+        html.H1('Crop Price Prediction Dashboard', className="text-3xl font-bold text-center text-blue-600 mb-4"),
+        
+        html.Div(className="flex justify-center mb-6", children=[
+            dcc.Dropdown(
+                id='crop-dropdown',
+                options=[
+                    {'label': 'Potatoes', 'value': 'potatoes'},
+                    {'label': 'Carrots', 'value': 'carrots'},
+                    {'label': 'Beans', 'value': 'beans'},
+                    {'label': 'Tomatoes', 'value': 'tomatoes'}
+                ],
+                multi=True,
+                value=['potatoes'],
+                className="w-1/2"
+            )
+        ]),
+        
+        html.Div(className="flex justify-center mb-6", children=[
+            dcc.Input(id='steps-input', type='number', value=12, min=1, className="border border-gray-300 rounded py-2 px-4")
+        ]),
+        
+        html.Div(className="flex justify-center mb-6", children=[
+            html.Button('Predict', id='submit-button', n_clicks=0, className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded")
+        ]),
+        
+        dcc.Graph(id='prediction-graph')
+    ])
+])

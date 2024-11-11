@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold mb-4">Sensor Data</h1>
+        <table class="min-w-full bg-white shadow-md rounded-lg">
+            <thead>
+                <tr>
+                    <th class="py-2 px-4">ID</th>
+                    <th class="py-2 px-4">Serial Number</th>
+                    <th class="py-2 px-4">Temperature</th>
+                    <th class="py-2 px-4">Humidity</th>
+                    <th class="py-2 px-4">Nitrogen</th>
+                    <th class="py-2 px-4">Potassium</th>
+                    <th class="py-2 px-4">Phosphorus</th>
+                    <th class="py-2 px-4">Soil pH</th>
+                    <th class="py-2 px-4">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in sensor_data %}
+                <tr class="border-t">
+                    <td class="py-2 px-4">{{ data[0] }}</td>
+                    <td class="py-2 px-4">{{ data[1] }}</td>
+                    <td class="py-2 px-4">{{ data[2] }} °C</td>
+                    <td class="py-2 px-4">{{ data[3] }}%</td>
+                    <td class="py-2 px-4">{{ data[4] }}</td>
+                    <td class="py-2 px-4">{{ data[5] }}</td>
+                    <td class="py-2 px-4">{{ data[8] }}</td>
+                    <td class="py-2 px-4">{{ data[9] }}</td>
+                    <td class="py-2 px-4">{{ data[12] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

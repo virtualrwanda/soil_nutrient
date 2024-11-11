@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.9.1/chart.min.js"></script>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        main {
+            padding: 20px;
+        }
+        
+        section {
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+        }
+        
+        form {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            margin-right: 10px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #555;
+        }
+        
+        #map-container {
+            height: 400px;
+            width: 100%;
+        }
+    </style>        
+
+
+</head>
+<body>
+    <header>
+        <h1>Crop Management System</h1>
+    </header>
+
+    <main>
+        <!-- Form for nutrient suggestions -->
+        <section id="nutrient-suggestion">
+            <h2>Nutrient Suggestions</h2>
+            <form id="nutrient-form" action="{{ url_for('suggest_nutrients') }}" method="post">
+                <label for="crop">Select Crop:</label>
+                <select id="crop" name="crop">
+                    <option value="potatoes">Potatoes</option>
+                    <option value="carrots">Carrots</option>
+                    <option value="beans">Beans</option>
+                    <option value="tomatoes">Tomatoes</option>
+                </select>
+                <button type="submit">Get Suggestions</button>
+            </form>
+
+            {% if suggestions %}
+                <h3>Suggestions for {{ selected_crop }}:</h3>
+                <ul>
+                    {% for suggestion in suggestions %}
+                        <li>{{ suggestion }}</li>
+                    {% endfor %}
+                </ul>
+
+                {% if price_predictions %}
+                    <h3>Price Predictions for {{ selected_crop }}:</h3>
+                    <canvas id="price-chart"></canvas>
+                    <script>
+                        // Generate the price chart
+                        document.addEventListener("DOMContentLoaded", function() {
+                            var ctx = document.getElementById('price-chart').getContext('2d');
+                            var priceChart = new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: Array.from({ length: price_predictions.length }, (v, k) => k + 1),
+                                    datasets: [{
+                                        label: 'Price Prediction',
+                                        data: {{ price_predictions | tojson }},
+                                        borderColor: 'rgba(75, 192, 192, 1)',
+                                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    scales: {
+                                        x: {
+                                            beginAtZero: true
+                                        },
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
+                {% endif %}
+            {% endif %}
+        </section>
+
+        <!-- Charts and Maps -->
+        <section id="charts">
+            <h2>Sensor Data Charts</h2>
+            <canvas id="sensor-chart"></canvas>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    var ctx = document.getElementById('sensor-chart').getContext('2d');
+                    var sensorChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: {{ chart_data.dates | tojson }},
+                            datasets: [
+                                {
+                                    label: 'Temperature',
+                                    data: {{ chart_data.temperature | tojson }},
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    borderWidth: 1
+                                },
+                                {
+                                    label: 'Humidity',
+                                    data: {{ chart_data.humidity | tojson }},
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                    borderWidth: 1
+                                },
+                                {
+                                    label: 'Nitrogen',
+                                    data: {{ chart_data.nitrogen | tojson }},
+                                    borderColor: 'rgba(255, 206, 86, 1)',
+                                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                                    borderWidth: 1
+                                },
+                                {
+                                    label: 'Potassium',
+                                    data: {{ chart_data.potassium | tojson }},
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    borderWidth: 1
+                                }
+                                // Add more datasets as needed
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                x: {
+                                    beginAtZero: true
+                                },
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                });
+            </script>
+        </section>
+
+        <!-- Map Section -->
+        <section id="map">
+            <h2>Sensor Data Map</h2>
+            <div id="map-container"></div>
+            <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    function initMap() {
+                        var map = new google.maps.Map(document.getElementById('map-container'), {
+                            zoom: 8,
+                            center: {lat: {{ map_data[0].lat if map_data else 0 }}, lng: {{ map_data[0].lng if map_data else 0 }}}
+                        });
+
+                        {% for data in map_data %}
+                            new google.maps.Marker({
+                                position: {lat: {{ data.lat }}, lng: {{ data.lng }}},
+                                map: map,
+                                title: '{{ data.serial_number }}'
+                            });
+                        {% endfor %}
+                    }
+                    initMap();
+                });
+            </script>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Crop Management System</p>
+    </footer>
+</body>
+</html>

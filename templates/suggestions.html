@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Price Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        input, select, button {
+            margin: 10px 0;
+            padding: 8px;
+            width: 100%;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Crop Price Prediction</h2>
+        <form id="priceForm">
+            <label for="crop">Select Crop:</label>
+            <select id="crop" name="crop">
+                <option value="wheat">Wheat</option>
+                <option value="rice">Rice</option>
+                <option value="corn">Corn</option>
+                <!-- Add more crops as needed -->
+            </select>
+            
+            <label for="season">Season (e.g., 1 for spring):</label>
+            <input type="number" id="season" name="season" required>
+            
+            <label for="region">Region (e.g., region code):</label>
+            <input type="text" id="region" name="region" required>
+            
+            <button type="button" onclick="getPrediction()">Get Prediction</button>
+        </form>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        async function getPrediction() {
+            // Collect form data
+            const crop = document.getElementById('crop').value;
+            const season = document.getElementById('season').value;
+            const region = document.getElementById('region').value;
+
+            // Send data to backend
+            const response = await fetch('/predict_price', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ crop, season, region })
+            });
+            
+            // Process response
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('result').innerText = `Predicted Price: $${data.predicted_price}`;
+            } else {
+                document.getElementById('result').innerText = 'Error: Could not get prediction.';
+            }
+        }
+    </script>
+</body>
+</html>
