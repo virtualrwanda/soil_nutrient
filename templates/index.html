@@ -8,6 +8,22 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <style>
+    table th, table td {
+        text-align: left;
+        padding: 8px 12px;
+    }
+    thead {
+        background-color: #f3f4f6;
+    }
+    tbody tr:nth-child(even) {
+        background-color: #f9fafb;
+    }
+    tbody tr:hover {
+        background-color: #edf2f7;
+    }
+</style>
+
 </head>
 <body class="bg-gray-100">
 
@@ -72,25 +88,25 @@
         </section>
 
         <!-- Sensor Data Table -->
-   <section id="data-table" class="mt-12">
+<section id="data-table" class="mt-12">
     <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Sensor Data Table</h2>
     <div class="overflow-auto bg-white p-6 rounded-lg shadow-lg">
-        <table class="min-w-full text-gray-700">
+        <table class="min-w-full text-gray-700 border-collapse">
             <thead>
                 <tr>
-                    <th class="py-2 px-4 border-b">Serial Number</th>
-                    <th class="py-2 px-4 border-b">Temperature (°C)</th>
-                    <th class="py-2 px-4 border-b">Moisture (%)</th>
-                    <th class="py-2 px-4 border-b">Nitrogen (mg/kg)</th>
-                    <th class="py-2 px-4 border-b">Phosphorus (mg/kg)</th>
-                    <th class="py-2 px-4 border-b">Potassium (mg/kg)</th>
-                    <th class="py-2 px-4 border-b">Soil pH</th>
-                    <th class="py-2 px-4 border-b">Date</th>
+                    <th class="py-2 px-4 border-b text-left">Serial Number</th>
+                    <th class="py-2 px-4 border-b text-left">Temperature (°C)</th>
+                    <th class="py-2 px-4 border-b text-left">Moisture (%)</th>
+                    <th class="py-2 px-4 border-b text-left">Nitrogen (mg/kg)</th>
+                    <th class="py-2 px-4 border-b text-left">Phosphorus (mg/kg)</th>
+                    <th class="py-2 px-4 border-b text-left">Potassium (mg/kg)</th>
+                    <th class="py-2 px-4 border-b text-left">Soil pH</th>
+                    <th class="py-2 px-4 border-b text-left">Date</th>
                 </tr>
             </thead>
             <tbody>
-             
-                    {% for data in sensor_data  %}
+                {% if sensor_data %}
+                    {% for data in sensor_data %}
                     <tr class="hover:bg-gray-100">
                         <td class="py-2 px-4 border-b">{{ data.serial_number }}</td>
                         <td class="py-2 px-4 border-b">{{ data.temperature }}</td>
@@ -102,7 +118,11 @@
                         <td class="py-2 px-4 border-b">{{ data.date }}</td>
                     </tr>
                     {% endfor %}
-               
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="py-4 text-center text-gray-500">No sensor data available</td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>
