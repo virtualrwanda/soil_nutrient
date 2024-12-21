@@ -219,6 +219,26 @@ def index():
         } for row in rows
     ]
 
+    # Fetch all sensor data for charts and maps
+    cursor.execute('SELECT * FROM sensor_data ORDER BY date DESC')
+    rows = cursor.fetchall()
+    conn.close()
+    sensor_data = [
+            {
+                'serial_number': row[1],
+                'temperature': row[2],
+                'humidity': row[3],
+                'nitrogen': row[4],
+                'potassium': row[5],
+                'moisture': row[6],
+                'eclec': row[7],
+                'phosphorus': row[8],
+                'soilPH': row[9],
+                'latitude': row[10],
+                'longitude': row[11],
+                'date': row[12]
+            } for row in rows
+        ]
     # Define suggestions_for_all_crops with sample data
     all_crops = ['Potatoes', 'Carrots', 'Beans', 'Tomatoes']
     current_soil_data = {
@@ -231,7 +251,7 @@ def index():
         suggestions = suggest_soil_nutrients(crop, current_soil_data)
         suggestions_for_all_crops[crop] = suggestions
 
-    return render_template('index.html', chart_data=chart_data, map_data=map_data, suggestions_for_all_crops=suggestions_for_all_crops)
+    return render_template('index.html', chart_data=chart_data, map_data=map_data, suggestions_for_all_crops=suggestions_for_all_crops,sensor_data=sensor_data)
 
 # @app.route('/')
 # def index():
