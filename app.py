@@ -220,9 +220,9 @@ def index():
     ]
 
     # Fetch all sensor data for charts and maps
-    cursor.execute('SELECT * FROM sensor_data ORDER BY date DESC')
-    rows = cursor.fetchall()
-    conn.close()
+    # cursor.execute('SELECT * FROM sensor_data ORDER BY date DESC')
+    # rows = cursor.fetchall()
+    # conn.close()
     sensor_data = [
             {
                 'serial_number': row[1],
