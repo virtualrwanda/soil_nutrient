@@ -6,6 +6,8 @@
     <title>Crop Recommendation and Nutrient Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.16/tailwind.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
 </head>
 <body class="bg-gray-100">
 
@@ -15,9 +17,9 @@
             <a href="#" class="text-white font-bold text-2xl">Crop Manager</a>
             <div class="space-x-4">
                 <a href="#nutrient-suggestions" class="text-white hover:text-gray-200 transition">Nutrient Suggestions</a>
-                   <a href="#data-visualizations" class="text-white hover:text-gray-200 transition">Data Visualizations</a>
+                <a href="#data-visualizations" class="text-white hover:text-gray-200 transition">Data Visualizations</a>
                 <a href="#data-table" class="text-white hover:text-gray-200 transition">Sensor Data Table</a>
-             
+                <a href="#map-section" class="text-white hover:text-gray-200 transition">Sensor Map</a>
             </div>
         </div>
     </nav>
@@ -56,8 +58,6 @@
             {% endif %}
         </section>
 
-    
-
         <!-- Sensor Data Visualization -->
         <section id="data-visualizations" class="mt-12">
             <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Sensor Data Visualizations</h2>
@@ -84,7 +84,6 @@
                             <th class="py-2 px-4 border-b">Nitrogen (mg/kg)</th>
                             <th class="py-2 px-4 border-b">Phosphorus (mg/kg)</th>
                             <th class="py-2 px-4 border-b">Potassium (mg/kg)</th>
-                            <th class="py-2 px-4 border-b">Moisture (%)</th>
                             <th class="py-2 px-4 border-b">Soil pH</th>
                             <th class="py-2 px-4 border-b">Date</th>
                         </tr>
@@ -94,11 +93,10 @@
                         <tr class="hover:bg-gray-100">
                             <td class="py-2 px-4 border-b">{{ data.serial_number }}</td>
                             <td class="py-2 px-4 border-b">{{ data.temperature }}</td>
-                            <td class="py-2 px-4 border-b">{{ data.humidity }}</td>
+                            <td class="py-2 px-4 border-b">{{ data.moisture }}</td>
                             <td class="py-2 px-4 border-b">{{ data.nitrogen }}</td>
                             <td class="py-2 px-4 border-b">{{ data.phosphorus }}</td>
                             <td class="py-2 px-4 border-b">{{ data.potassium }}</td>
-                         
                             <td class="py-2 px-4 border-b">{{ data.soilPH }}</td>
                             <td class="py-2 px-4 border-b">{{ data.date }}</td>
                         </tr>
@@ -108,68 +106,50 @@
             </div>
         </section>
 
-       
+        <!-- Map Section -->
+        <section id="map-section" class="mt-12">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Sensor Data Map</h2>
+            <div id="map" class="h-96 rounded-lg shadow-md"></div>
+        </section>
     </div>
 
-    <!-- Chart.js Configuration -->
+    <!-- JavaScript Section -->
     <script>
-        const temperatureChart = new Chart(document.getElementById('temperatureChart'), {
+        // Temperature Chart
+        new Chart(document.getElementById('temperatureChart'), {
             type: 'line',
             data: {
-                labels: {{ chart_data.dates|tojson }},
+                labels: {{ chart_data.dates | tojson }},
                 datasets: [{
                     label: 'Temperature',
-                    data: {{ chart_data.temperature|tojson }},
+                    data: {{ chart_data.temperature | tojson }},
                     borderColor: 'rgb(255, 99, 132)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
                     fill: true,
                     tension: 0.3
                 }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
             }
         });
 
-        const nitrogenChart = new Chart(document.getElementById('nitrogenChart'), {
+        // Nitrogen Chart
+        new Chart(document.getElementById('nitrogenChart'), {
             type: 'line',
             data: {
-                labels: {{ chart_data.dates|tojson }},
+                labels: {{ chart_data.dates | tojson }},
                 datasets: [{
                     label: 'Nitrogen',
-                    data: {{ chart_data.nitrogen|tojson }},
+                    data: {{ chart_data.nitrogen | tojson }},
                     borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     fill: true,
                     tension: 0.3
                 }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
             }
         });
 
-        // Map initialization with Leaflet.js
+        // Map Initialization
         var map = L.map('map').setView([0, 0], 2);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        {% for sensor_data in map_data %}
-        L.marker([{{ sensor_data.lat }}, {{ sensor_data.lng }}]).addTo(map)
-            .bindPopup(`
-                <b>Serial Number:</b> {{ sensor_data.serial_number }}<br>
-                <b>Temperature:</b> {{ sensor_data.temperature }} °C<br>
-                <b>Humidity:</b> {{ sensor_data.humidity }} %<br>
-                <b>Nitrogen:</b> {{ sensor_data.nitrogen }} mg/kg<br>
-                <b>Potassium:</b> {{ sensor_data.potassium }} mg/kg<br>
-                <b>Moisture:</b> {{ sensor_data.moisture }} %<br>
-                <b>Phosphorus:</b> {{ sensor_data.phosphorus }} mg/kg<br>
-                <b>Soil pH:</b> {{ sensor_data.soilPH }}<br>
-                <b>Date:</b> {{ sensor_data.date }}
-            `);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        {% for sensor in map_data %}
+        L.marker([{{ sensor.lat }}, {{ sensor.lng }}]).addTo(map).bindPopup("Serial: {{ sensor.serial_number }}");
         {% endfor %}
     </script>
 </body>
