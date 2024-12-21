@@ -90,7 +90,7 @@
             </thead>
             <tbody>
                 {% if sensor_data %}
-                    {% for data in map_data  %}
+                    {% for data in sensor_data  %}
                     <tr class="hover:bg-gray-100">
                         <td class="py-2 px-4 border-b">{{ data.serial_number }}</td>
                         <td class="py-2 px-4 border-b">{{ data.temperature }}</td>
