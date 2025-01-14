@@ -427,6 +427,7 @@ def index():
 #                 current_value = current_soil_data.get(nutrient)
 #                 if current_value is None:
 #                     reasons.append(f"Missing {nutrient} data.")
+#                     reasons.append(f"Increase Calcium by applying {random(1.50,3.09)} kg/ha.")
 #                 elif min_value <= current_value <= max_value:
 #                     in_range_count += 1  # Nutrient is within range
 #                 else:
