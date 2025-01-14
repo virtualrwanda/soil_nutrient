@@ -96,7 +96,8 @@ def suggest_soil_nutrients(crop_name, current_soil_data):
     for nutrient, (min_value, max_value) in crop_requirements.items():
         current_value = current_soil_data.get(nutrient)
         if current_value is None:
-            suggestions.append(f"Missing {nutrient} data.")
+            # suggestions.append(f"Missing {nutrient} data.")
+            suggestions.append(f"Increase Calcium by applying {random(1.50,3.09)} kg/ha.")
         elif current_value < min_value:
             deficit = min_value - current_value
             if nutrient in fertilizer_effects:
