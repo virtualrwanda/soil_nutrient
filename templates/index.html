@@ -55,9 +55,20 @@
             <form action="{{ url_for('suggest_nutrients') }}" method="post" class="space-y-4 bg-blue-50 p-6 rounded-lg shadow-sm">
                 <label for="crop" class="block font-medium text-gray-700">Select Crop:</label>
                 <select name="crop" id="crop" class="border border-gray-300 rounded py-2 px-3 w-full" required>
-                    {% for crop in suggestions_for_all_crops %}
+<!--                     {% for crop in suggestions_for_all_crops %}
                     <option value="{{ crop }}">{{ crop }}</option>
-                    {% endfor %}
+                    {% endfor %} -->
+                    {% if suggestions_for_all_crops %}
+                        {% for crop in suggestions_for_all_crops %}
+                            <option value="{{ crop }}">{{ crop }}</option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="Beans">Beans</option>
+                        <option value="Tomatoes">Tomatoes</option>                    
+                        <option value="Potatoes">Potatoes</option>
+                        <option value="Carrots">Carrots</option>
+                    {% endif %}
+
                 </select>
                 <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-lg transition">Get Suggestions</button>
             </form>
