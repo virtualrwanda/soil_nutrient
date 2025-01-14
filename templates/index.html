@@ -54,7 +54,7 @@
             <h2 class="text-2xl font-semibold text-blue-700 mb-4">Nutrient Suggestions</h2>
             <form action="{{ url_for('suggest_nutrients') }}" method="post" class="space-y-4 bg-blue-50 p-6 rounded-lg shadow-sm">
                 <label for="crop" class="block font-medium text-gray-700">Select Crop:</label>
-                <select name="crop" id="crop" class="border border-gray-300 rounded py-2 px-3 w-full">
+                <select name="crop" id="crop" class="border border-gray-300 rounded py-2 px-3 w-full" required>
                     {% for crop in suggestions_for_all_crops %}
                     <option value="{{ crop }}">{{ crop }}</option>
                     {% endfor %}
