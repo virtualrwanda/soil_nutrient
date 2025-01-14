@@ -4,6 +4,8 @@ from datetime import datetime
 import pickle
 import pandas as pd
 import joblib
+import random
+
 
 
 # Load the ARIMA models
@@ -97,7 +99,7 @@ def suggest_soil_nutrients(crop_name, current_soil_data):
         current_value = current_soil_data.get(nutrient)
         if current_value is None:
             # suggestions.append(f"Missing {nutrient} data.")
-            suggestions.append(f"Increase Calcium by applying {random(1.50,3.09)} kg/ha.")
+            suggestions.append(f"Increase Calcium by applying {random.uniform(1.50, 3.09):.2f} kg/ha.")
         elif current_value < min_value:
             deficit = min_value - current_value
             if nutrient in fertilizer_effects:
@@ -427,7 +429,7 @@ def index():
 #                 current_value = current_soil_data.get(nutrient)
 #                 if current_value is None:
 #                     reasons.append(f"Missing {nutrient} data.")
-#                     reasons.append(f"Increase Calcium by applying {random(1.50,3.09)} kg/ha.")
+#                     reasons.append(f"Increase Calcium by applying {random.uniform(1.50, 3.09):.2f} kg/ha.")
 #                 elif min_value <= current_value <= max_value:
 #                     in_range_count += 1  # Nutrient is within range
 #                 else:
