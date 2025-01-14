@@ -552,94 +552,17 @@ def make_prediction(model, crop, steps):
 
 #     # Generate suggestions for the selected crop
 #     suggestions = suggest_soil_nutrients(selected_crop, current_soil_data)
-# @app.route('/suggest_nutrients', methods=['POST'])
-# def suggest_nutrients():
-#     # Get selected crop from the form
-#     selected_crop = request.form.get('crop').lower()  # convert crop name to lowercase to match model keys
-
-#     # Retrieve the latest sensor data
-#     conn = sqlite3.connect('database.db')
-#     cursor = conn.cursor()
-#     cursor.execute('SELECT * FROM sensor_data ORDER BY date DESC LIMIT 1')
-#     latest_row = cursor.fetchone()
-
-#     if latest_row:
-#         current_soil_data = {
-#             'pH': latest_row[9],  # soilPH
-#             'Nitrogen': latest_row[4],
-#             'Phosphorus': latest_row[8],
-#             'Potassium': latest_row[5]
-#         }
-#     else:
-#         # If no sensor data is available, return default or error
-#         current_soil_data = {
-#             'pH': None,
-#             'Nitrogen': None,
-#             'Phosphorus': None,
-#             'Potassium': None
-#         }
-
-#     # Generate suggestions for the selected crop
-#     suggestions = suggest_soil_nutrients(selected_crop.capitalize(), current_soil_data)
-
-#     # Make a prediction for the selected crop's price using the predict function
-#     if selected_crop in models:
-#         steps = 12  # default to predicting 12 months ahead
-#         prediction_model = models[selected_crop]
-#         price_predictions = make_prediction(prediction_model, selected_crop, steps)
-#     else:
-#         price_predictions = []
-
-#     return render_template('index.html', suggestions=suggestions, selected_crop=selected_crop.capitalize(), price_predictions=price_predictions)
-#     # Fetch all sensor data to render in the charts
-#     cursor.execute('SELECT * FROM sensor_data ORDER BY date DESC')
-#     rows = cursor.fetchall()
-#     conn.close()
-
-#     # Prepare data for charts and map
-#     chart_data = {
-#         'temperature': [row[2] for row in rows],
-#         'humidity': [row[3] for row in rows],
-#         'nitrogen': [row[4] for row in rows],
-#         'potassium': [row[5] for row in rows],
-#         'moisture': [row[6] for row in rows],
-#         'phosphorus': [row[8] for row in rows],
-#         'soilPH': [row[9] for row in rows],
-#         'elec': [row[7] for row in rows],
-#         'dates': [row[12] for row in rows]
-#     }
-
-#     map_data = [
-#         {
-#             "lat": row[10],
-#             "lng": row[11],
-#             "serial_number": row[1],
-#             "temperature": row[2],
-#             "humidity": row[3],
-#             "nitrogen": row[4],
-#             "potassium": row[5],
-#             "moisture": row[6],
-#             "eclec": row[7],
-#             "phosphorus": row[8],
-#             "soilPH": row[9],
-#             "date": row[12]
-#         } for row in rows
-#     ]
-
-#     return render_template('index.html', suggestions=suggestions, selected_crop=selected_crop, price_predictions=price_predictions, chart_data=chart_data, map_data=map_data)
-
 @app.route('/suggest_nutrients', methods=['POST'])
 def suggest_nutrients():
-    # Get selected crop from form
-    selected_crop = request.form.get('crop').capitalize()
+    # Get selected crop from the form
+    selected_crop = request.form.get('crop').lower()  # convert crop name to lowercase to match model keys
 
     # Retrieve the latest sensor data
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM sensor_data ORDER BY date DESC LIMIT 1')
     latest_row = cursor.fetchone()
-    
-    # Prepare current soil data if sensor data is available
+
     if latest_row:
         current_soil_data = {
             'pH': latest_row[9],  # soilPH
@@ -648,6 +571,7 @@ def suggest_nutrients():
             'Potassium': latest_row[5]
         }
     else:
+        # If no sensor data is available, return default or error
         current_soil_data = {
             'pH': None,
             'Nitrogen': None,
@@ -655,38 +579,24 @@ def suggest_nutrients():
             'Potassium': None
         }
 
-    # Generate nutrient suggestions
-    suggestions = suggest_soil_nutrients(selected_crop, current_soil_data)
+    # Generate suggestions for the selected crop
+    suggestions = suggest_soil_nutrients(selected_crop.capitalize(), current_soil_data)
 
-    # Make predictions if the crop model exists
-    if selected_crop.lower() in models:
+    # Make a prediction for the selected crop's price using the predict function
+    if selected_crop in models:
         steps = 12  # default to predicting 12 months ahead
-        prediction_model = models[selected_crop.lower()]
-        price_predictions = make_prediction(prediction_model, selected_crop.lower(), steps)
+        prediction_model = models[selected_crop]
+        price_predictions = make_prediction(prediction_model, selected_crop, steps)
     else:
         price_predictions = []
 
-    # Fetch all sensor data for charts and maps
+    return render_template('index.html', suggestions=suggestions, selected_crop=selected_crop.capitalize(), price_predictions=price_predictions)
+    # Fetch all sensor data to render in the charts
     cursor.execute('SELECT * FROM sensor_data ORDER BY date DESC')
     rows = cursor.fetchall()
     conn.close()
-    sensor_data = [
-            {
-                'serial_number': row[1],
-                'temperature': row[2],
-                'humidity': row[3],
-                'nitrogen': row[4],
-                'potassium': row[5],
-                'moisture': row[6],
-                'eclec': row[7],
-                'phosphorus': row[8],
-                'soilPH': row[9],
-                'latitude': row[10],
-                'longitude': row[11],
-                'date': row[12]
-            } for row in rows
-        ]
-    # Prepare chart data for temperature, humidity, etc.
+
+    # Prepare data for charts and map
     chart_data = {
         'temperature': [row[2] for row in rows],
         'humidity': [row[3] for row in rows],
@@ -695,10 +605,10 @@ def suggest_nutrients():
         'moisture': [row[6] for row in rows],
         'phosphorus': [row[8] for row in rows],
         'soilPH': [row[9] for row in rows],
+        'elec': [row[7] for row in rows],
         'dates': [row[12] for row in rows]
     }
 
-    # Prepare map data for sensor locations
     map_data = [
         {
             "lat": row[10],
@@ -716,15 +626,105 @@ def suggest_nutrients():
         } for row in rows
     ]
 
-    return render_template(
-        'index.html',
-        suggestions=suggestions,
-        selected_crop=selected_crop,
-        price_predictions=price_predictions,
-        chart_data=chart_data,
-        map_data=map_data,
-        sensor_data=sensor_data
-    )
+    return render_template('index.html', suggestions=suggestions, selected_crop=selected_crop, price_predictions=price_predictions, chart_data=chart_data, map_data=map_data)
+
+# @app.route('/suggest_nutrients', methods=['POST'])
+# def suggest_nutrients():
+#     # Get selected crop from form
+#     selected_crop = request.form.get('crop').capitalize()
+
+#     # Retrieve the latest sensor data
+#     conn = sqlite3.connect('database.db')
+#     cursor = conn.cursor()
+#     cursor.execute('SELECT * FROM sensor_data ORDER BY date DESC LIMIT 1')
+#     latest_row = cursor.fetchone()
+    
+#     # Prepare current soil data if sensor data is available
+#     if latest_row:
+#         current_soil_data = {
+#             'pH': latest_row[9],  # soilPH
+#             'Nitrogen': latest_row[4],
+#             'Phosphorus': latest_row[8],
+#             'Potassium': latest_row[5]
+#         }
+#     else:
+#         current_soil_data = {
+#             'pH': None,
+#             'Nitrogen': None,
+#             'Phosphorus': None,
+#             'Potassium': None
+#         }
+
+#     # Generate nutrient suggestions
+#     suggestions = suggest_soil_nutrients(selected_crop, current_soil_data)
+
+#     # Make predictions if the crop model exists
+#     if selected_crop.lower() in models:
+#         steps = 12  # default to predicting 12 months ahead
+#         prediction_model = models[selected_crop.lower()]
+#         price_predictions = make_prediction(prediction_model, selected_crop.lower(), steps)
+#     else:
+#         price_predictions = []
+
+#     # Fetch all sensor data for charts and maps
+#     cursor.execute('SELECT * FROM sensor_data ORDER BY date DESC')
+#     rows = cursor.fetchall()
+#     conn.close()
+#     sensor_data = [
+#             {
+#                 'serial_number': row[1],
+#                 'temperature': row[2],
+#                 'humidity': row[3],
+#                 'nitrogen': row[4],
+#                 'potassium': row[5],
+#                 'moisture': row[6],
+#                 'eclec': row[7],
+#                 'phosphorus': row[8],
+#                 'soilPH': row[9],
+#                 'latitude': row[10],
+#                 'longitude': row[11],
+#                 'date': row[12]
+#             } for row in rows
+#         ]
+#     # Prepare chart data for temperature, humidity, etc.
+#     chart_data = {
+#         'temperature': [row[2] for row in rows],
+#         'humidity': [row[3] for row in rows],
+#         'nitrogen': [row[4] for row in rows],
+#         'potassium': [row[5] for row in rows],
+#         'moisture': [row[6] for row in rows],
+#         'phosphorus': [row[8] for row in rows],
+#         'soilPH': [row[9] for row in rows],
+#         'dates': [row[12] for row in rows]
+#     }
+
+#     # Prepare map data for sensor locations
+#     map_data = [
+#         {
+#             "lat": row[10],
+#             "lng": row[11],
+#             "serial_number": row[1],
+#             "temperature": row[2],
+#             "humidity": row[3],
+#             "nitrogen": row[4],
+#             "potassium": row[5],
+#             "moisture": row[6],
+#             "eclec": row[7],
+#             "phosphorus": row[8],
+#             "soilPH": row[9],
+#             "date": row[12]
+#         } for row in rows
+#     ]
+
+#     return render_template(
+#         'index.html',
+#         suggestions=suggestions,
+#         selected_crop=selected_crop,
+#         price_predictions=price_predictions,
+#         chart_data=chart_data,
+#         map_data=map_data,
+#         sensor_data=sensor_data
+#     )
 
 
 if __name__ == '__main__':
