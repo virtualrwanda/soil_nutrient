@@ -626,7 +626,15 @@ def suggest_nutrients():
         } for row in rows
     ]
 
-    return render_template('index.html', suggestions=suggestions, selected_crop=selected_crop, price_predictions=price_predictions, chart_data=chart_data, map_data=map_data)
+    return render_template(
+        'index.html',
+        suggestions=suggestions,
+        selected_crop=selected_crop,
+        price_predictions=price_predictions,
+        chart_data=chart_data,
+        map_data=map_data,
+        sensor_data=sensor_data
+    )
 
 # @app.route('/suggest_nutrients', methods=['POST'])
 # def suggest_nutrients():
