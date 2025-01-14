@@ -22,6 +22,7 @@ crop_nutrient_requirements = {
     'Carrots': {'pH': (6.0, 7.0), 'Nitrogen': (20, 40), 'Phosphorus': (20, 40), 'Potassium': (120, 200), 'Calcium': (40, 80)},
     'Beans': {'pH': (6.0, 7.5), 'Nitrogen': (10, 20), 'Phosphorus': (15, 30), 'Potassium': (100, 180), 'Calcium': (20, 60)},
     'Tomatoes': {'pH': (6.0, 6.8), 'Nitrogen': (50, 70), 'Phosphorus': (40, 60), 'Potassium': (200, 300), 'Calcium': (40, 80)},
+    'Rice': {'pH': (5.5, 7.0), 'Nitrogen': (60, 100), 'Phosphorus': (20, 40), 'Potassium': (30, 60), 'Calcium': (20, 50)},
     # Additional crops...
 }
 
@@ -243,7 +244,7 @@ def index():
             } for row in rows
         ]
     # Define suggestions_for_all_crops with sample data
-    all_crops = ['Potatoes', 'Carrots', 'Beans', 'Tomatoes']
+    all_crops = ['Potatoes', 'Carrots', 'Beans', 'Tomatoes','Rice']
     current_soil_data = {
         'pH': 6.5, 'Nitrogen': 30, 'Phosphorus': 20, 'Potassium': 150  # Sample values
     }
@@ -489,6 +490,7 @@ models = {
     'carrots': carrot_model,
     'beans': bean_model,
     'tomatoes': tomato_model
+    'rice': tomato_model
 }
 
 # Function to make predictions for a given crop and steps
